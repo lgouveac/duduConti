@@ -4,17 +4,26 @@ import Home from './pages/Home'
 import Projeto from './pages/Projeto'
 import Sobre from './pages/Sobre'
 import Contato from './pages/Contato'
+import Admin from './pages/admin/Admin'
+import { useContent } from './lib/ContentContext'
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const { pages } = useContent()
 
   const closeMenu = () => setMenuOpen(false)
 
-  // Close menu on route change
-  if (menuOpen) {
-    const unlisten = () => setMenuOpen(false)
+  // O painel admin tem layout próprio, sem a sidebar do site.
+  if (location.pathname.startsWith('/admin')) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    )
   }
+
+  const site = pages?.site || {}
 
   return (
     <div className="app">
@@ -33,9 +42,13 @@ function App() {
       <aside className={`sidebar ${menuOpen ? 'sidebar--open' : ''}`}>
         <div className="sidebar__brand">
           <div className="sidebar__name">
-            <Link to="/" onClick={closeMenu}>Eduardo<br />Conti</Link>
+            <Link to="/" onClick={closeMenu}>
+              {site.name_line1 || 'Eduardo'}
+              <br />
+              {site.name_line2 || 'Conti'}
+            </Link>
           </div>
-          <div className="sidebar__tagline">diretor de fotografia</div>
+          <div className="sidebar__tagline">{site.tagline || 'diretor de fotografia'}</div>
         </div>
 
         <nav className="sidebar__nav">
@@ -64,7 +77,7 @@ function App() {
         </nav>
 
         <div className="sidebar__footer">
-          Eduardo Conti {new Date().getFullYear()}
+          {site.name_line1 || 'Eduardo'} {site.name_line2 || 'Conti'} {new Date().getFullYear()}
         </div>
       </aside>
 

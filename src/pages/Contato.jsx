@@ -1,17 +1,24 @@
+import { useContent } from '../lib/ContentContext'
+
 export default function Contato() {
-  const phone = '5521972031230'
-  const message = encodeURIComponent('Olá Eduardo! Gostaria de conversar sobre um projeto.')
+  const { pages, loading } = useContent()
+
+  if (loading || !pages) {
+    return <div className="state state--loading">carregando…</div>
+  }
+
+  const contato = pages.contato || {}
+  const phone = (contato.whatsapp || '5521972031230').replace(/\D/g, '')
+  const message = encodeURIComponent(
+    contato.whatsapp_message || 'Olá Eduardo! Gostaria de conversar sobre um projeto.'
+  )
   const whatsappUrl = `https://wa.me/${phone}?text=${message}`
 
   return (
     <div className="contato">
-      <h2 className="contato__title">Fala comigo</h2>
+      <h2 className="contato__title">{contato.title || 'Fala comigo'}</h2>
 
-      <p className="contato__text">
-        Tem um projeto em mente? Quer bater um papo sobre vídeo, fotografia ou
-        qualquer ideia criativa? Manda uma mensagem no WhatsApp que a gente
-        conversa.
-      </p>
+      <p className="contato__text">{contato.text}</p>
 
       <a
         href={whatsappUrl}

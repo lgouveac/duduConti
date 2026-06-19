@@ -1,22 +1,29 @@
+import { useContent } from '../lib/ContentContext'
+
 export default function Sobre() {
+  const { pages, loading } = useContent()
+
+  if (loading || !pages) {
+    return <div className="state state--loading">carregando…</div>
+  }
+
+  const sobre = pages.sobre || {}
+
   return (
     <div className="sobre">
-      <img
-        className="sobre__image"
-        src="https://framerusercontent.com/images/6O5WPIBQPHiSd6HJvZTs8lhkc.jpeg"
-        alt="Eduardo Conti"
-      />
+      {sobre.image && (
+        <img className="sobre__image" src={sobre.image} alt={sobre.title || 'Sobre'} />
+      )}
 
-      <h2 className="sobre__title">Sobre</h2>
+      <h2 className="sobre__title">{sobre.title || 'Sobre'}</h2>
 
-      <p className="sobre__text">
-        Sou o Eduardo Conti, fotógrafo e cinegrafista na área há mais de 13 anos.
-        Formado em Publicidade, minha vibe é toda sobre criatividade, detalhes e
-        muita técnica. Nasci e cresci no Rio de Janeiro, então já viu, né? Meu
-        trabalho tem aquele jeitinho carioca, cheio de energia e estilo. E, claro,
-        como bom flamenguista e amante da praia, o surf tá sempre no meu radar.
-        Bora embarcar nessa jornada de storytelling e imagens que ficam na memória!
-      </p>
+      <div className="sobre__text">
+        {(sobre.text || '').split('\n\n').map((paragraph, i) => (
+          <p key={i} style={{ marginBottom: 12 }}>
+            {paragraph}
+          </p>
+        ))}
+      </div>
     </div>
   )
 }

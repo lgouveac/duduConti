@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom'
-import { projects } from '../data/projects'
+import { useContent } from '../lib/ContentContext'
 
 export default function Home() {
+  const { projects, loading } = useContent()
+
+  if (loading || !projects) {
+    return <div className="state state--loading">carregando…</div>
+  }
+
   // Distribute images across the masonry - show all project images
   const items = projects.flatMap((project) =>
-    project.images.map((img, i) => ({
+    (project.images || []).map((img, i) => ({
       ...project,
       image: img,
       imageIndex: i,

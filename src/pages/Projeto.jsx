@@ -1,15 +1,22 @@
 import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import { projects } from '../data/projects'
+import { useContent } from '../lib/ContentContext'
+import { videoEmbedUrl, videoIframeProps } from '../lib/video'
 
 export default function Projeto() {
   const { slug } = useParams()
-  const index = projects.findIndex((p) => p.slug === slug)
-  const project = projects[index]
+  const { projects, loading } = useContent()
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [slug])
+
+  if (loading || !projects) {
+    return <div className="state state--loading">carregando…</div>
+  }
+
+  const index = projects.findIndex((p) => p.slug === slug)
+  const project = projects[index]
 
   if (!project) {
     return (
@@ -24,6 +31,8 @@ export default function Projeto() {
 
   const prev = index > 0 ? projects[index - 1] : null
   const next = index < projects.length - 1 ? projects[index + 1] : null
+
+  const embedUrl = videoEmbedUrl(project.video_provider, project.video_id)
 
   return (
     <div className="project-detail">
@@ -43,11 +52,11 @@ export default function Projeto() {
         )}
       </div>
 
-      {project.vimeoId && (
+      {embedUrl && (
         <div className="project-detail__video">
           <iframe
-            src={`https://player.vimeo.com/video/${project.vimeoId}?autopause=0&title=0&byline=0&portrait=0`}
-            allow="autoplay; fullscreen; picture-in-picture"
+            src={embedUrl}
+            {...videoIframeProps(project.video_provider)}
             allowFullScreen
             title={project.title}
           />
@@ -55,7 +64,7 @@ export default function Projeto() {
       )}
 
       <div className="project-detail__images">
-        {project.images.map((img, i) => (
+        {(project.images || []).map((img, i) => (
           <img key={i} src={img} alt={`${project.title} - ${i + 1}`} loading="lazy" />
         ))}
       </div>
